@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>心动二选一</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--pink:#ec4899;--rose:#fb7185;--purple:#8b5cf6;--deep:#27272a;--muted:#71717a;--card:rgba(255,255,255,.78);--line:rgba(255,255,255,.86);--green:#22c55e;--red:#ef4444}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;min-height:100dvh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--deep);background:radial-gradient(circle at 8% 4%,rgba(244,114,182,.32),transparent 30%),radial-gradient(circle at 92% 12%,rgba(168,85,247,.25),transparent 32%),linear-gradient(135deg,#fff1f2,#fdf2f8 48%,#f3e8ff);padding:max(18px,env(safe-area-inset-top)) 12px max(28px,env(safe-area-inset-bottom));overflow-x:hidden}
+button,input,textarea{font-family:inherit}
+button{touch-action:manipulation;user-select:none}
+button:hover{transform:translateY(-1px) scale(1.01)}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5;transform:none;box-shadow:none}
+.app{width:min(100%,980px);margin:0 auto}
+.hero{text-align:center;margin:6px 0 20px}
+.badge{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;padding:8px 14px;background:rgba(255,255,255,.82);border:1px solid #fbcfe8;color:#be185d;font-weight:900;font-size:13px;box-shadow:0 8px 24px rgba(219,39,119,.08)}
+h1{margin:12px 0 8px;font-size:clamp(36px,8vw,70px);line-height:.95;letter-spacing:-.07em}
+.subtitle{max-width:720px;margin:0 auto;color:var(--muted);font-size:clamp(14px,2.3vw,18px);line-height:1.75}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:0 24px 70px rgba(190,24,93,.13);backdrop-filter:blur(16px);padding:22px}
+.grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:18px;align-items:stretch}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.label{color:#be185d;font-size:13px;font-weight:950;margin-bottom:5px}
+h2{margin:0;font-size:clamp(24px,4vw,34px);line-height:1.18;letter-spacing:-.03em}
+.btn{border:0;border-radius:18px;cursor:pointer;font-weight:950;min-height:50px;padding:14px 20px;transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease}
+.primary{color:white;background:linear-gradient(135deg,var(--pink),var(--purple));box-shadow:0 18px 36px rgba(236,72,153,.28)}
+.secondary{color:#52525b;background:rgba(255,255,255,.86);border:1px solid #fbcfe8}
+.danger{color:white;background:linear-gradient(135deg,#fb7185,#ef4444);box-shadow:0 16px 32px rgba(239,68,68,.22)}
+.row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.pill{padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.72);border:1px solid #fce7f3;line-height:1.55}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:rgba(255,255,255,.72);border:1px solid #fce7f3;border-radius:18px;padding:12px 14px}
+.stat small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.stat strong{font-size:20px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{min-height:70px;border-radius:22px;border:1px solid #fce7f3;background:#fff;color:#3f3f46;box-shadow:0 10px 24px rgba(219,39,119,.08);font-size:16px;font-weight:900;text-align:left;padding:16px;cursor:pointer}
+.choice b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--pink);color:#fff;font-size:13px;margin-right:8px}
+.result{padding:16px;border-radius:22px;background:rgba(255,255,255,.78);border:1px solid #fce7f3;line-height:1.75;margin-top:16px}
+.ok{color:#16a34a}.no{color:#dc2626}
+.screen{display:none}.screen.active{display:block;animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr}.top-row{align-items:stretch;flex-direction:column}.top-row .btn{width:100%}.choice-grid{grid-template-columns:1fr}.card{border-radius:24px;padding:17px}.row{display:grid;grid-template-columns:1fr 1fr;width:100%}.row.single{grid-template-columns:1fr}.btn{width:100%}h1{font-size:39px}.subtitle{font-size:14px;line-height:1.65}}
+@media(max-width:360px){.row{grid-template-columns:1fr}h1{font-size:34px}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero">
+  <div class="badge">💞 情侣互动问答</div>
+  <h1>心动二选一</h1>
+  <p class="subtitle">两个人先后选择 A/B，答案一致就同步 +1，不一致就聊聊原因。</p>
+</section>
+
+<section class="screen active" id="game">
+  <div class="grid">
+    <div class="card">
+      <div class="top-row">
+        <div><div class="label">答题进度</div><h2>心动同步率</h2></div>
+        <button class="btn secondary" id="resetBtn">重新开始</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><small>题目</small><strong id="qNum">1 / 10</strong></div>
+        <div class="stat"><small>同步</small><strong id="score">0 次</strong></div>
+        <div class="stat"><small>当前</small><strong id="turn">小韩</strong></div>
+      </div>
+      <div class="pill" id="tip">小韩同学先选，答案会隐藏；小王同学再选。</div>
+      <div class="result" id="history">记录会显示在这里。</div>
+    </div>
+    <div class="card">
+      <div id="questionArea"></div>
+    </div>
+  </div>
+</section>
+<section class="screen" id="final">
+  <div class="card" style="text-align:center">
+    <div class="badge">💗 今日同步报告</div>
+    <h2 id="finalTitle" style="margin-top:14px"></h2>
+    <div class="result" id="finalText"></div>
+    <div class="row single"><button class="btn primary" id="againBtn">再测一次</button></div>
+  </div>
+</section>
+
+</main>
+<script>
+const questions=[
+["周末更想怎么过？","宅家贴贴","出门约会"],
+["生气时更希望对方怎么做？","马上哄我","先给空间"],
+["纪念日更想要什么？","惊喜礼物","认真陪伴"],
+["晚上约会更喜欢？","看电影","吃夜宵"],
+["吵架后更希望？","当天说清楚","冷静后再聊"],
+["旅行更喜欢？","计划清楚","随性出发"],
+["收到消息更在意？","回复速度","回复内容"],
+["约会拍照更喜欢？","甜甜合照","搞怪自拍"],
+["对方撒娇时你会？","马上心软","假装淡定"],
+["下一次约会更想？","浪漫一点","轻松一点"],
+["表达喜欢更倾向？","直接说出来","用行动证明"],
+["两人相处更重要？","新鲜感","安全感"]
+];
+let qs=[],idx=0,turn="han",han=null,score=0,history=[];
+const $=id=>document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(){qs=shuffle(questions).slice(0,10);idx=0;turn="han";han=null;score=0;history=[];$("game").classList.add("active");$("final").classList.remove("active");render()}
+function render(){
+ $("qNum").textContent=`${idx+1} / 10`; $("score").textContent=`${score} 次`; $("turn").textContent=turn==="han"?"小韩":"小王";
+ $("history").innerHTML=history.length?history.map((h,i)=>`<div style="margin:8px 0">${i+1}. ${h.same?"✅":"❌"} ${h.q}<br><small>韩：${h.han} ｜ 王：${h.wang}</small></div>`).join(""):"记录会显示在这里。";
+ const q=qs[idx];
+ $("questionArea").innerHTML=`<div class="label">第 ${idx+1} 题</div><h2 style="margin-bottom:18px">${q[0]}</h2>
+ <div class="pill" style="margin-bottom:16px">${turn==="han"?"请小韩同学选择，选完会隐藏答案。":"小韩已选择 💌，请小王同学选择。"}</div>
+ <div class="choice-grid"><button class="choice" data-v="1"><b>A</b>${q[1]}</button><button class="choice" data-v="2"><b>B</b>${q[2]}</button></div>`;
+ document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>choose(+b.dataset.v));
+}
+function choose(v){
+ const q=qs[idx];
+ if(turn==="han"){han=v;turn="wang";render();return}
+ const same=han===v;if(same)score++;
+ history.push({q:q[0],same,han:q[han],wang:q[v]});
+ $("questionArea").innerHTML=`<h2>${same?"✅ 心动同步！":"❌ 选择不同！"}</h2>
+ <div class="result">小韩：<b>${q[han]}</b><br>小王：<b>${q[v]}</b><br>${same?"默契 +1":"聊聊为什么这样选，也很甜。"}</div>
+ <div class="row single"><button class="btn primary" id="nextBtn">${idx===9?"查看结果":"下一题"}</button></div>`;
+ $("score").textContent=`${score} 次`; history.length&&($("history").innerHTML=history.map((h,i)=>`<div style="margin:8px 0">${i+1}. ${h.same?"✅":"❌"} ${h.q}<br><small>韩：${h.han} ｜ 王：${h.wang}</small></div>`).join(""));
+ $("nextBtn").onclick=()=>{if(idx===9)finish();else{idx++;turn="han";han=null;render();}};
+}
+function finish(){
+ $("game").classList.remove("active");$("final").classList.add("active");
+ let title=score>=8?"超高同步情侣":score>=5?"甜蜜磨合情侣":"聊天升级情侣";
+ $("finalTitle").textContent=`${score}/10：${title}`;
+ $("finalText").innerHTML=`你们有 <b>${score}</b> 题选择一致。不同的地方不是扣分点，而是很适合聊一聊的小入口。`;
+}
+$("resetBtn").onclick=start;$("againBtn").onclick=start;start();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"7939e04a4baf43c8b86a560f74aac60e","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
